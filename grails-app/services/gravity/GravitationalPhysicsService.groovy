@@ -11,6 +11,7 @@ class GravitationalPhysicsService {
                 gravitationalSystem: currentTimestep.gravitationalSystem
         ).save(failOnError: true, flush: true)
 
+
         def lastPositions = Body.where {
             timestep == currentTimestep
         }.list()
@@ -30,7 +31,7 @@ class GravitationalPhysicsService {
                 Double G = currentTimestep.gravitationalSystem.G
                 Force gravity = GravitationalForceCalculator.GetGravitationalForce(G, thisObject, thatObject, newTimestep)
                 Force opposite = new Force(
-                        timestep: newTimestep,
+                        timestep: currentTimestep,
                         thisBody: thatObject,
                         causingBody: thisObject,
                         magnitude: gravity.magnitude,

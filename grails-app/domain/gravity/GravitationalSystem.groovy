@@ -8,7 +8,7 @@ class GravitationalSystem {
     String timeUnit
     String distanceUnit
     Integer timestepAmount
-    double G
+    Double G
 
     static hasMany = [timestep: Timestep, body: Body]
 
