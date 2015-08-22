@@ -32,9 +32,9 @@ class BootStrap {
             ).save(flush:true)
             Body earth = new Body (
                     name: "Earth",
-                    x: 152e9, y: 0, z:0,
+                    x: 1.471e11, y: 0, z:0,
                     mass: 5.9736e24,
-                    vx: 0, vy: 0, vz: 0,
+                    vx: 0, vy: 29805.5, vz: 0,
                     radius: 6378000.0,
                     gravitationalSystem: solar
             ).save(flush:true)

@@ -27,9 +27,8 @@ class GravitationalPhysicsService {
             for (j=lastPositions.size()-1; j>i; j--) {
                 Body thisObject = lastPositions[i]
                 Body thatObject = lastPositions[j]
-                thisObject.timestep = newTimestep
                 Double G = currentTimestep.gravitationalSystem.G
-                Force gravity = GravitationalForceCalculator.GetGravitationalForce(G, thisObject, thatObject)
+                Force gravity = GravitationalForceCalculator.GetGravitationalForce(G, thisObject, thatObject, newTimestep)
                 Force opposite = new Force(
                         timestep: newTimestep,
                         thisBody: thatObject,
@@ -44,7 +43,7 @@ class GravitationalPhysicsService {
                         magnitude: gravity.magnitude, x: gravity.fx, y: gravity.fy, z: gravity.fz
                 )
                 force_matrix[j][i] = new Vector(
-                        magnitude: gravity.magnitude, x: gravity.fx, y: gravity.fy, z: gravity.fz
+                        magnitude: opposite.magnitude, x: opposite.fx, y: opposite.fy, z: opposite.fz
                 )
 
                 gravity.save(failOnError: true, flush: true)
@@ -88,7 +87,8 @@ class GravitationalPhysicsService {
                     vx: new_vx, vy: new_vy, vz:new_vz
             ).save(failOnError: true, flush: true)
 
-            if (!newTimestep.body) newTimestep.body = new HashSet<Body>()
+            if (!newTimestep.body)
+                newTimestep.body = new HashSet<Body>()
             newTimestep.body.add(newPosition)
         }
 
