@@ -33,4 +33,16 @@ class Body {
         
         return displacement
     }
+
+    public Vector getVelocityVector() {
+        Vector velocity = new Vector(
+                x: this.vx,
+                y: this.vy,
+                z: this.vz
+        )
+
+        velocity.setMagnitude()
+
+        return velocity
+    }
 }

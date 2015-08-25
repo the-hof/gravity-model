@@ -15,4 +15,16 @@ class Force {
 
     static constraints = {
     }
+
+    public Vector getForceVector() {
+        Vector force = new Vector(
+                x: this.fx,
+                y: this.fy,
+                z: this.fz
+        )
+
+        force.setMagnitude()
+
+        return force
+    }
 }
