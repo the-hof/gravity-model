@@ -13,5 +13,7 @@ class EventCalculatorService {
         Body celebrant_initial = initial.body.find { it.name == celebrant }
         Body celebrant_last = lastTimestep.body.find { it.name == celebrant }
         Body celebrant_this = thisTimestep.body.find { it.name == celebrant }
+
+        Vector initial_displacement
     }
 }

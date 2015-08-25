@@ -14,13 +14,17 @@ public final class VectorCalculator {
 
         def magnitude = Math.sqrt(resultVector.x**2 + resultVector.y**2 + resultVector.z**2)
 
-        Vector result = new Vector (
-                magnitude: magnitude,
-                x: resultVector.x,
-                y: resultVector.y,
-                z: resultVector.z
-        )
+        resultVector.setMagnitude()
 
         return resultVector
+    }
+
+    public static Vector SubtractVectors(Vector source, Vector target) {
+        def matrix = new Vector[2]
+
+        matrix[0] = target
+        matrix[1] = source.getScaledVector(-1)
+
+        return SumVectors(matrix)
     }
 }
