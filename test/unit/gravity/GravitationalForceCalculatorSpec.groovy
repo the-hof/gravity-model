@@ -16,13 +16,13 @@ class GravitationalForceCalculatorSpec extends Specification {
                 x:0, y:0, z:0,
 
                         name: "Earth",
-                        mass: 5.9736e24
+                        mass: 5.97219e24
 
         )
 
         Integer smallMass = 1
         Body smallObject = new Body (
-                x:6378000, y:0, z:0,
+                x:6371000, y:0, z:0,
                 name: "Small Object",
                         mass: smallMass
         )
@@ -32,7 +32,7 @@ class GravitationalForceCalculatorSpec extends Specification {
         Force gravity = GravitationalForceCalculator.GetGravitationalForce(G, earth, smallObject, new Timestep())
 
         then: "it should be 9.8 * the mass of the small object"
-        assert (Math.abs(gravity.magnitude)* smallMass).round(3) == 9.800
+        assert (Math.abs(gravity.magnitude)* smallMass).round(3) == 9.820
     }
 
     def "should calculate the weight of an object on a nontrivial point on the earth's surface"() {
@@ -41,13 +41,13 @@ class GravitationalForceCalculatorSpec extends Specification {
                 x:0, y:0, z:0,
 
                         name: "Earth",
-                        mass: 5.9736e24
+                        mass: 5.97219e24
 
         )
 
         Integer smallMass = 1
         Body smallObject = new Body (
-                x:1000, y:-3000000, z:5628399.68,
+                x:1000, y:-3000000, z:5620466,
 
                         name: "Small Object",
                         mass: smallMass
@@ -59,6 +59,6 @@ class GravitationalForceCalculatorSpec extends Specification {
         Force gravity = GravitationalForceCalculator.GetGravitationalForce(G, earth, smallObject, new Timestep())
 
         then: "it should be 9.8 * the mass of the small object"
-        assert (Math.abs(gravity.magnitude)* smallMass).round(3) == 9.800
+        assert (Math.abs(gravity.magnitude)* smallMass).round(3) == 9.820
     }
 }

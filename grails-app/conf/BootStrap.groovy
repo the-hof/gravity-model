@@ -123,7 +123,7 @@ class BootStrap {
             Body sun = new Body(
                     name: "Sun",
                     x: 0, y: 0, z:0,
-                    mass: 1.9891e30,
+                    mass: 1.9885e30,
                     vx: 0, vy: 0, vz: 0,
                     radius: 696000000.0,
                     gravitationalSystem: solar
@@ -131,9 +131,9 @@ class BootStrap {
             Body earth = new Body (
                     name: "Earth",
                     x: 1.471e11, y: 0, z:0,
-                    mass: 5.9736e24,
-                    vx: 0, vy: 29805.5, vz: 0,
-                    radius: 6378000.0,
+                    mass: 5.97219e24,
+                    vx: 0, vy: 30300, vz: 0,
+                    radius: 6371000.0,
                     gravitationalSystem: solar
             ).save(flush:true)
         }

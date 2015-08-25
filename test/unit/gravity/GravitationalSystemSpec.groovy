@@ -9,12 +9,4 @@ import spock.lang.Specification
 @TestFor(GravitationalSystem)
 class GravitationalSystemSpec extends Specification {
 
-    def setup() {
-    }
-
-    def cleanup() {
-    }
-
-    void "test something"() {
-    }
 }

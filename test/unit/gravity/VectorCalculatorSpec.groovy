@@ -56,4 +56,45 @@ class VectorCalculatorSpec extends Specification {
         assert totalForce.y == 0
         assert totalForce.z == 0
     }
+
+    def "should correctly calculate its own magnitude"() {
+        given: "A vector"
+        def v_before = new Vector(x: 2, y: 9, z:17)
+
+        when: "the vector calculates its magnitude"
+        v_before.setMagnitude()
+
+        then: "it comes up with the correct value"
+        assert v_before.magnitude == Math.sqrt(2**2 + 9**2 + 17**2)
+    }
+
+    def "should scale vector to a unit vector"() {
+        given: "A vector"
+        Double magnitude = Math.sqrt(2**2 + 9**2 + 17**2)
+        def v_before = new Vector(x: 2, y: 9, z:17, magnitude: magnitude)
+
+        when: "is scaled"
+        def v_after = v_before.getUnitVector()
+
+        then: "the x, y, and z values should be scaled to a unit length"
+        assert v_after.x.round(5) == (v_before.x/magnitude).round(5)
+        assert v_after.y.round(5) == (v_before.y/magnitude).round(5)
+        assert v_after.z.round(5) == (v_before.z/magnitude).round(5)
+        assert (v_after.x**2 + v_after.y**2 + v_after.z ** 2).round(5) == 1
+    }
+
+    def "should correctly multiply a vector by a scalar"() {
+        given: "A vector"
+        def v_before = new Vector(x: 2, y: 9, z:17)
+
+        when: "multiplied by a scalar"
+        def v_after = v_before.getScaledVector(-1)
+
+        then: "the x, y, and z values should be scaled"
+        assert v_after.x == -2
+        assert v_after.y == -9
+        assert v_after.z == -17
+        assert v_after.magnitude == Math.sqrt(2**2 + 9**2 + 17**2)
+
+    }
 }

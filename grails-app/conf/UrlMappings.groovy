@@ -10,6 +10,7 @@ class UrlMappings {
         "/system"(resources:"GravitationalSystem") {
             "/timestep"(resources:"Timestep")
             "/body"(resources:"Body")
+            "/event"(resources:"Event")
         }
         "/"(view:"/index")
         "500"(view:'/error')

@@ -16,6 +16,7 @@ class GravitationalPhysicsService {
             timestep == currentTimestep
         }.list()
 
+
         //calculate forces on all bodies
         def force_matrix = new Vector[lastPositions.size()][lastPositions.size()]
         def i, j
@@ -29,7 +30,7 @@ class GravitationalPhysicsService {
                 Body thisObject = lastPositions[i]
                 Body thatObject = lastPositions[j]
                 Double G = currentTimestep.gravitationalSystem.G
-                Force gravity = GravitationalForceCalculator.GetGravitationalForce(G, thisObject, thatObject, newTimestep)
+                Force gravity = GravitationalForceCalculator.GetGravitationalForce(G, thisObject, thatObject, currentTimestep)
                 Force opposite = new Force(
                         timestep: currentTimestep,
                         thisBody: thatObject,
