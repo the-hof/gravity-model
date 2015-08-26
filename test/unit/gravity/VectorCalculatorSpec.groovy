@@ -111,4 +111,18 @@ class VectorCalculatorSpec extends Specification {
         assert v_after.y == -5
         assert v_after.z == -12
     }
+
+    def "should average two vectors"() {
+        given: "Two vectors"
+        def v1 = new Vector(x: 2, y: 9, z:17)
+        def v2 = new Vector(x: 3, y: 4, z: 5)
+
+        when:  "subtracting v2-v1"
+        def v_after = VectorCalculator.AverageVectors(v1, v2)
+
+        then: "they should be correctly subtracted"
+        assert v_after.x == 2.5
+        assert v_after.y == 6.5
+        assert v_after.z == 11
+    }
 }

@@ -27,4 +27,16 @@ public final class VectorCalculator {
 
         return SumVectors(matrix)
     }
+
+    public static Vector AverageVectors(Vector one, Vector two) {
+        def matrix = new Vector[2]
+
+        matrix[0] = one
+        matrix[1] = two
+
+        def sum = SumVectors(matrix)
+
+        def result = sum.getScaledVector(0.5)
+        return result
+    }
 }

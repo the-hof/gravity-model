@@ -8,12 +8,14 @@ class Force {
 
     Body thisBody
     Body causingBody
+    String type
     Double magnitude
     Double fx
     Double fy
     Double fz
 
     static constraints = {
+        type nullable: true
     }
 
     public Vector getForceVector() {

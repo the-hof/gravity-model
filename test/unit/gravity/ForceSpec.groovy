@@ -12,7 +12,7 @@ class ForceSpec extends Specification {
     def "should give the correct force vector"() {
         given: "A body in a spacial coordinate"
         Force b = new Force(
-                x: 5, y: 10, z:27
+                fx: 5, fy: 10, fz:27
         )
 
         when: "the displacement vector is calculated"

@@ -29,7 +29,7 @@ class GravitationalForceCalculatorSpec extends Specification {
         Double G = 6.6738e-11
 
         when: "the force due to gravity is calculated"
-        Force gravity = GravitationalForceCalculator.GetGravitationalForce(G, earth, smallObject, new Timestep())
+        Force gravity = GravitationalForceCalculator.CalculateGravitationalForce(G, earth, smallObject, new Timestep())
 
         then: "it should be 9.8 * the mass of the small object"
         assert (Math.abs(gravity.magnitude)* smallMass).round(3) == 9.820
@@ -56,7 +56,7 @@ class GravitationalForceCalculatorSpec extends Specification {
         Double G = 6.6738e-11
 
         when: "the force due to gravity is calculated"
-        Force gravity = GravitationalForceCalculator.GetGravitationalForce(G, earth, smallObject, new Timestep())
+        Force gravity = GravitationalForceCalculator.CalculateGravitationalForce(G, earth, smallObject, new Timestep())
 
         then: "it should be 9.8 * the mass of the small object"
         assert (Math.abs(gravity.magnitude)* smallMass).round(3) == 9.820

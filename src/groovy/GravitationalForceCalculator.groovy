@@ -3,7 +3,7 @@ package gravity
 public final class GravitationalForceCalculator {
     private GravitationalForceCalculator() {}
 
-    public static Force GetGravitationalForce(double G, Body thisObject, Body thatObject, Timestep timestep) {
+    public static Force CalculateGravitationalForce(double G, Body thisObject, Body thatObject, Timestep timestep) {
         Double thisMass = thisObject.mass
         Double thatMass = thatObject.mass
 
@@ -26,11 +26,11 @@ public final class GravitationalForceCalculator {
         Double y = thatObject.y - thisObject.y
         Double z = thatObject.z - thisObject.z
 
-
         return new Force(
                 timestep: timestep,
                 thisBody: thisObject,
                 causingBody: thatObject,
+                type: "CALCULATED",
                 magnitude: magnitude,
                 fx: (x/scale_ratio),
                 fy: (y/scale_ratio),

@@ -13,4 +13,8 @@ class Timestep {
     static mapping = {
         id generator:'sequence', params:[sequence:'seq_timestep_id']
     }
+
+    Body getBodyByName(String name) {
+        return this.body.find({ it.name == name })
+    }
 }
