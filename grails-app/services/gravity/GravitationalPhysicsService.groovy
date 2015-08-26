@@ -11,11 +11,9 @@ class GravitationalPhysicsService {
                 gravitationalSystem: currentTimestep.gravitationalSystem
         ).save(failOnError: true, flush: true)
 
-
         def lastPositions = Body.where {
             timestep == currentTimestep
         }.list()
-
 
         //calculate forces on all bodies
         def force_matrix = new Vector[lastPositions.size()][lastPositions.size()]
@@ -78,15 +76,6 @@ class GravitationalPhysicsService {
         return calculatedTimestep
     }
 
-    private Force getGravityFromPriorTimestep(Timestep priorTimestep, String thisName, String thatName) {
-        Body thisBody = priorTimestep.getBodyByName(thisName)
-        Body thatBody = priorTimestep.getBodyByName(thatName)
-
-        Force lastTimestepForce = Force.findByTimestepAndThisBodyAndThatBody(
-                priorTimestep, thisBody, thatBody
-        )
-    }
-
     // v_next = (Fnet / mass) * t + v_prev
     private Vector calculateNewVelocity(Vector sumOfForces, Double mass, Integer t, Body b) {
         def new_vx = (sumOfForces.x/mass) * t
@@ -120,13 +109,5 @@ class GravitationalPhysicsService {
                 y: new_y,
                 z: new_z
         )
-    }
-
-    private Timestep getPriorTimestep(Timestep currentTimestep) {
-        def currentTimestepNumber = (currentTimestep.number)
-
-        def priorTimestep = Timestep.findByNumber(currentTimestepNumber - 1)
-
-        return priorTimestep
     }
 }
