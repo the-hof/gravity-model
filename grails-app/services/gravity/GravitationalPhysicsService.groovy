@@ -16,40 +16,9 @@ class GravitationalPhysicsService {
         }.list()
 
         //calculate forces on all bodies
-        def force_matrix = new Vector[lastPositions.size()][lastPositions.size()]
-        def i, j
+        def force_matrix = gravitationFunction(lastPositions, currentTimestep, "CALCULATED")
 
-        for (i=0; i<lastPositions.size(); i++) {
-            force_matrix[i][i] = new Vector(
-                    magnitude: 0, x: 0, y: 0, z: 0
-            )
-
-            for (j=lastPositions.size()-1; j>i; j--) {
-                Body thisObject = lastPositions[i]
-                Body thatObject = lastPositions[j]
-                Double G = currentTimestep.gravitationalSystem.G
-                Force calculatedGravity = GravitationalForceCalculator.CalculateGravitationalForce(
-                        G, thisObject, thatObject, currentTimestep
-                )
-
-                Force calculatedOpposite = new Force(
-                        timestep: currentTimestep,
-                        thisBody: thatObject,
-                        causingBody: thisObject,
-                        type: "CALCULATED",
-                        magnitude: calculatedGravity.magnitude,
-                        fx: (-1) * calculatedGravity.fx,
-                        fy: (-1) * calculatedGravity.fy,
-                        fz: (-1) * calculatedGravity.fz
-                )
-
-                calculatedGravity.save(failOnError: true, flush: true)
-                calculatedOpposite.save(failOnError: true, flush: true)
-
-                force_matrix[i][j] = calculatedGravity.getForceVector()
-                force_matrix[j][i] = calculatedOpposite.getForceVector()
-            }
-
+        for (def i = 0; i < lastPositions.size(); i++) {
             Vector sumOfForces = VectorCalculator.SumVectors(force_matrix[i])
             Double mass = lastPositions[i].mass
 
@@ -74,6 +43,45 @@ class GravitationalPhysicsService {
         }
 
         return calculatedTimestep
+    }
+
+    private Vector[][] gravitationFunction(List<Body> positions, Timestep timestep, String calcType) {
+        def i, j
+        def force_matrix = new Vector[positions.size()][positions.size()]
+
+        for (i = 0; i < positions.size(); i++) {
+            force_matrix[i][i] = new Vector(
+                    magnitude: 0, x: 0, y: 0, z: 0
+            )
+
+            for (j = positions.size() - 1; j > i; j--) {
+                Body thisObject = positions[i]
+                Body thatObject = positions[j]
+                Double G = timestep.gravitationalSystem.G
+                Force calculatedGravity = GravitationalForceCalculator.CalculateGravitationalForce(
+                        G, thisObject, thatObject, timestep, calcType
+                )
+
+                Force calculatedOpposite = new Force(
+                        timestep: timestep,
+                        thisBody: thatObject,
+                        causingBody: thisObject,
+                        type: calcType,
+                        magnitude: calculatedGravity.magnitude,
+                        fx: (-1) * calculatedGravity.fx,
+                        fy: (-1) * calculatedGravity.fy,
+                        fz: (-1) * calculatedGravity.fz
+                )
+
+                calculatedGravity.save(failOnError: true, flush: true)
+                calculatedOpposite.save(failOnError: true, flush: true)
+
+                force_matrix[i][j] = calculatedGravity.getForceVector()
+                force_matrix[j][i] = calculatedOpposite.getForceVector()
+            }
+        }
+
+        return force_matrix
     }
 
     // v_next = (Fnet / mass) * t + v_prev
