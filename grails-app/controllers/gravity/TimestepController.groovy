@@ -14,6 +14,19 @@ class TimestepController {
         render result as JSON
     }
 
+    def show() {
+        def systemId = params.GravitationalSystemId
+        def timestepId = params.id
+
+        def timestep = Timestep.find {
+            gravitationalSystem == GravitationalSystem.get(systemId) &&
+                    id == timestepId
+        }
+
+        def result = [timestep: timestep]
+        render result as JSON
+    }
+
     def create() {
         def stellarSystem = GravitationalSystem.get(params.GravitationalSystemId)
         def timesteps = Timestep.where {
