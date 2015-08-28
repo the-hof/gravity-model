@@ -51,7 +51,8 @@ class GravitationalPhysicsServiceSpec extends Specification {
         then: "it should calculate -0.0057458 m/s**2"
         assert Body.count() == 4
         def target = -0.0057458 * solar.timestepAmount
-        def value = newTimestep.body[1].vx
+        def the_earth = newTimestep.body.find( {it.name == "Earth"})
+        def value = the_earth.vx
         assert value.round(3) == target.setScale(3, BigDecimal.ROUND_HALF_UP)
     }
 }

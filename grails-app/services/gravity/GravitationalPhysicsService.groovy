@@ -18,36 +18,62 @@ class GravitationalPhysicsService {
         //calculate forces on all bodies
         def force_matrix = gravitationFunction(lastPositions, currentTimestep, "CALCULATED")
 
+        HashSet<Body> expectedLocations = new HashSet<Body>();
+
         for (def i = 0; i < lastPositions.size(); i++) {
             Vector sumOfForces = VectorCalculator.SumVectors(force_matrix[i])
-            Double mass = lastPositions[i].mass
+            Body newPosition = calculateNewPosition(sumOfForces, lastPositions[i], calculatedTimestep)
 
-            def t = currentTimestep.gravitationalSystem.timestepAmount
-
-            Vector new_velocity = calculateNewVelocity(sumOfForces, mass, t, lastPositions[i])
-            Vector new_position = calculateNewPosition(sumOfForces, mass, t, lastPositions[i])
-
-            Body newPosition = new Body(
-                    gravitationalSystem: lastPositions[i].gravitationalSystem,
-                    mass: lastPositions[i].mass,
-                    radius: lastPositions[i].radius,
-                    name: lastPositions[i].name,
-                    timestep: calculatedTimestep,
-                    x: new_position.x, y: new_position.y, z: new_position.z,
-                    vx: new_velocity.x, vy: new_velocity.y, vz: new_velocity.z
-            ).save(failOnError: true, flush: true)
-
-            if (!calculatedTimestep.body)
-                calculatedTimestep.body = new HashSet<Body>()
-            calculatedTimestep.body.add(newPosition)
+            expectedLocations.add(newPosition)
         }
 
+        //now recalculate the forces based on the new positions
+        def perturb_force_matrix = gravitationFunction(expectedLocations.toList(), currentTimestep, "AVERAGED")
+
+        HashSet<Body> newLocations = new HashSet<Body>()
+
+        for (def i = 0; i < lastPositions.size(); i++) {
+            Vector sumOfForces = VectorCalculator.SumVectors(force_matrix[i])
+            Vector sumOfPerturbs = VectorCalculator.SumVectors(perturb_force_matrix[i])
+            Vector avgVector = VectorCalculator.AverageVectors(sumOfForces, sumOfPerturbs)
+
+            Body newPosition = calculateNewPosition(avgVector, lastPositions[i], calculatedTimestep)
+            newPosition.save(failOnError: true, flush: true)
+            newLocations.add(newPosition)
+        }
+
+        calculatedTimestep.body = newLocations
+
         return calculatedTimestep
+    }
+
+    private Body calculateNewPosition(Vector sumOfForces, Body affectedBody, Timestep timestep) {
+
+        Double mass = affectedBody.mass
+
+        def t = timestep.gravitationalSystem.timestepAmount
+
+        Vector new_velocity = calculateNewVelocity(sumOfForces, mass, t, affectedBody)
+        Vector new_position = calculateNewPosition(sumOfForces, mass, t, affectedBody)
+
+        Body newPosition = new Body(
+                gravitationalSystem: affectedBody.gravitationalSystem,
+                mass: affectedBody.mass,
+                radius: affectedBody.radius,
+                name: affectedBody.name,
+                timestep: timestep,
+                x: new_position.x, y: new_position.y, z: new_position.z,
+                vx: new_velocity.x, vy: new_velocity.y, vz: new_velocity.z
+        )
+
+        return newPosition
     }
 
     private Vector[][] gravitationFunction(List<Body> positions, Timestep timestep, String calcType) {
         def i, j
         def force_matrix = new Vector[positions.size()][positions.size()]
+
+        positions = positions.sort( { it.name })
 
         for (i = 0; i < positions.size(); i++) {
             force_matrix[i][i] = new Vector(
@@ -73,8 +99,8 @@ class GravitationalPhysicsService {
                         fz: (-1) * calculatedGravity.fz
                 )
 
-                calculatedGravity.save(failOnError: true, flush: true)
-                calculatedOpposite.save(failOnError: true, flush: true)
+                //calculatedGravity.save(failOnError: true, flush: true)
+                //calculatedOpposite.save(failOnError: true, flush: true)
 
                 force_matrix[i][j] = calculatedGravity.getForceVector()
                 force_matrix[j][i] = calculatedOpposite.getForceVector()
