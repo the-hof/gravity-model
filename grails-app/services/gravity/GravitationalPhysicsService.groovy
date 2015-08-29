@@ -13,7 +13,7 @@ class GravitationalPhysicsService {
 
         def lastPositions = Body.where {
             timestep == currentTimestep
-        }.list()
+        }.list().sort( {it.name} )
 
         //calculate forces on all bodies
         def force_matrix = gravitationFunction(lastPositions, currentTimestep, "CALCULATED")
@@ -42,7 +42,38 @@ class GravitationalPhysicsService {
             newLocations.add(newPosition)
         }
 
-        calculatedTimestep.body = newLocations
+        def listLocations = newLocations.toList().sort( {it.name} )
+        calculatedTimestep.body = new HashSet<Body>()
+
+        for (int i=0; i<newLocations.size(); i++) {
+            calculatedTimestep.body.add(newLocations[i])
+
+            for (int j=0; j<newLocations.size(); j++) {
+                if (i != j) {
+                    Force calcedForce = new Force (
+                            timestep: calculatedTimestep,
+                            thisBody: listLocations[i],
+                            causingBody: listLocations[j],
+                            type: "INITIAL",
+                            magnitude: force_matrix[i][j].magnitude,
+                            fx: force_matrix[i][j].x,
+                            fy: force_matrix[i][j].y,
+                            fz: force_matrix[i][j].z
+                    ).save(failOnError:true, flush:true)
+
+                    Force avgedForce = new Force (
+                            timestep: calculatedTimestep,
+                            thisBody: listLocations[i],
+                            causingBody: listLocations[j],
+                            type: "AVERAGED",
+                            magnitude: perturb_force_matrix[i][j].magnitude,
+                            fx: perturb_force_matrix[i][j].x,
+                            fy: perturb_force_matrix[i][j].y,
+                            fz: perturb_force_matrix[i][j].z
+                    ).save(failOnError:true, flush:true)
+                }
+            }
+        }
 
         return calculatedTimestep
     }
@@ -84,26 +115,19 @@ class GravitationalPhysicsService {
                 Body thisObject = positions[i]
                 Body thatObject = positions[j]
                 Double G = timestep.gravitationalSystem.G
-                Force calculatedGravity = GravitationalForceCalculator.CalculateGravitationalForce(
+                Vector calculatedGravity = GravitationalForceCalculator.CalculateGravitationalForce(
                         G, thisObject, thatObject, timestep, calcType
                 )
 
-                Force calculatedOpposite = new Force(
-                        timestep: timestep,
-                        thisBody: thatObject,
-                        causingBody: thisObject,
-                        type: calcType,
+                Vector calculatedOpposite = new Vector(
                         magnitude: calculatedGravity.magnitude,
-                        fx: (-1) * calculatedGravity.fx,
-                        fy: (-1) * calculatedGravity.fy,
-                        fz: (-1) * calculatedGravity.fz
+                        x: (-1) * calculatedGravity.x,
+                        y: (-1) * calculatedGravity.y,
+                        z: (-1) * calculatedGravity.z
                 )
 
-                //calculatedGravity.save(failOnError: true, flush: true)
-                //calculatedOpposite.save(failOnError: true, flush: true)
-
-                force_matrix[i][j] = calculatedGravity.getForceVector()
-                force_matrix[j][i] = calculatedOpposite.getForceVector()
+                force_matrix[i][j] = calculatedGravity
+                force_matrix[j][i] = calculatedOpposite
             }
         }
 
@@ -112,6 +136,7 @@ class GravitationalPhysicsService {
 
     // v_next = (Fnet / mass) * t + v_prev
     private Vector calculateNewVelocity(Vector sumOfForces, Double mass, Integer t, Body b) {
+        assert mass != 0
         def new_vx = (sumOfForces.x/mass) * t
         def new_vy = (sumOfForces.y/mass)  * t
         def new_vz = (sumOfForces.z/mass) * t
@@ -119,15 +144,19 @@ class GravitationalPhysicsService {
         new_vy += b.vy
         new_vz += b.vz
 
-        return new Vector(
+        def result = new Vector(
                 x: new_vx,
                 y: new_vy,
                 z: new_vz
         )
+        result.setMagnitude()
+        return result
     }
 
     //x_next = x_prev + old_vx * t + (1/2) (Fnet / mass) * t**2
     private Vector calculateNewPosition(Vector sumOfForces, Double mass, Integer t, Body b) {
+        assert mass != 0
+
         def new_x = b.x
         def new_y = b.y
         def new_z = b.z
@@ -138,10 +167,12 @@ class GravitationalPhysicsService {
         new_y += ((sumOfForces.y/mass) * t**2)/2
         new_z += ((sumOfForces.z/mass) * t**2)/2
 
-        return new Vector(
+        def result = new Vector(
                 x: new_x,
                 y: new_y,
                 z: new_z
         )
+        result.setMagnitude()
+        return result
     }
 }

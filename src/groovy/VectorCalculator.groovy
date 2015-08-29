@@ -12,8 +12,6 @@ public final class VectorCalculator {
             resultVector.z = resultVector.z + vector.z
         }
 
-        def magnitude = Math.sqrt(resultVector.x**2 + resultVector.y**2 + resultVector.z**2)
-
         resultVector.setMagnitude()
 
         return resultVector
